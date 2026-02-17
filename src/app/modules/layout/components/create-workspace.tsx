@@ -1,4 +1,4 @@
-import { useCreateWorkspace } from "@/app/workspace";
+import { useCreateWorkspace } from "@/app/modules/workspace/hooks/workspace";
 import Modal from "@/components/ui/model";
 import { useState } from "react";
 import { toast } from "sonner";
