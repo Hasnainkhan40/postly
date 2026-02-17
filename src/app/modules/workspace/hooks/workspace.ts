@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createWorkspace, getWorkspaceById, getWorkspaces } from "./modules/workspace/actions";
+import { createWorkspace, getWorkspaceById, getWorkspaces } from "../actions";
 
 
 export function useWorkspaces() {
