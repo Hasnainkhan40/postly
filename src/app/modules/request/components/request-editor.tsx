@@ -6,7 +6,9 @@ import RequestEditorArea from "./request-editor-area";
 
 
 export default function RequestEditor() {
-  const { tabs, activeTabId, updateTab } = useRequestPlaygroundStore();
+  const { tabs, activeTabId, updateTab 
+
+  } = useRequestPlaygroundStore();
   const activeTab = tabs.find((t) => t.id === activeTabId) || tabs[0];
 
   if (!activeTab) return null;
@@ -17,9 +19,7 @@ export default function RequestEditor() {
 
      <div className="flex flex-1 flex-col w-full justify-start mt-4 items-center ">
        <RequestEditorArea tab={activeTab} updateTab={updateTab} />
-     
-     </div>
-
+     </div>  
    </div>
   );
 }
