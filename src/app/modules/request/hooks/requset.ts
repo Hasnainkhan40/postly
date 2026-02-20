@@ -1,5 +1,5 @@
 import { useMutation , useQuery , useQueryClient } from "@tanstack/react-query";
-import { addRequestToCollection, type Request , getAllRequestFromCollection , saveRequest } from "../actions";
+import { addRequestToCollection, type Request , getAllRequestFromCollection , saveRequest, run } from "../actions";
 import { useRequestPlaygroundStore } from "../store/useRequestStore";
 
 
@@ -40,4 +40,18 @@ export function useSaveRequest(id: string) {
               updateTabFromSavedRequest(activeTabId!, data);
         }
     })
+}
+
+export function useRunRequest(requestId: string) {
+
+  const {setResponseViewerData} = useRequestPlaygroundStore();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => await run(requestId),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      // @ts-ignore
+      setResponseViewerData(data);
+    },
+  });
 }

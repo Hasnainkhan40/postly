@@ -3,10 +3,11 @@
 import { useRequestPlaygroundStore } from "../store/useRequestStore";
 import RequestBar from "./request-bar";
 import RequestEditorArea from "./request-editor-area";
+import ResponseViewer from "./response-viewer";
 
 
 export default function RequestEditor() {
-  const { tabs, activeTabId, updateTab 
+  const { tabs, activeTabId, updateTab ,responseViewerData
 
   } = useRequestPlaygroundStore();
   const activeTab = tabs.find((t) => t.id === activeTabId) || tabs[0];
@@ -19,7 +20,13 @@ export default function RequestEditor() {
 
      <div className="flex flex-1 flex-col w-full justify-start mt-4 items-center ">
        <RequestEditorArea tab={activeTab} updateTab={updateTab} />
-     </div>  
+     
+     </div>
+       {
+        responseViewerData &&
+       <ResponseViewer responseData={responseViewerData} />
+       }
+      
    </div>
   );
 }
