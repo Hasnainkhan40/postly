@@ -8,10 +8,10 @@ import {
 
 
 import { Loader } from "lucide-react";
-import { useWorkspaceStore } from "../modules/layout/store";
-import { useGetWorkspace } from "../modules/workspace/hooks/workspace";
-import TabbedSidebar from "../modules/collections/components/sidebar";
-import RequestPlayground from "../modules/request/components/request-playground";
+import { useWorkspaceStore } from "../../modules/layout/store";
+import { useGetWorkspace } from "../../modules/workspace/hooks/workspace";
+import TabbedSidebar from "../../modules/collections/components/sidebar";
+import RequestPlayground from "../../modules/request/components/request-playground";
 
 
 const Page = () => {
