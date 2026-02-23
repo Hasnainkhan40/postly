@@ -24,9 +24,10 @@ import {
 } from '@/components/ui/form'
 import { RotateCcw, Copy, Check, Code, AlignLeft, FileText, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useGenerateJsonBody } from '@/modules/ai/hooks/ai-suggestion'
 
 import { useRequestPlaygroundStore } from '../store/useRequestStore'
-import { useWorkspaceStore } from '../../layout/store'
+import { useWorkspaceStore } from '@/modules/layout/store'
 
 
 const MonacoEditor = dynamic(
@@ -62,7 +63,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
 
   const {tabs, activeTabId} = useRequestPlaygroundStore();
 
-//   const {mutateAsync , data , isPending , isError} = useGenerateJsonBody()
+  const {mutateAsync , data , isPending , isError} = useGenerateJsonBody()
 
   const form = useForm<BodyEditorFormData>({
     resolver: zodResolver(bodyEditorSchema),
@@ -97,36 +98,36 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
     setShowGenerateDialog(true);
   }
 
-//   const onGenerateBody = async (promptText: string) => {
-//     try {
+  const onGenerateBody = async (promptText: string) => {
+    try {
      
     
-//       if (bodyValue) {
-//         try {
-//           JSON.parse(bodyValue);
-//         } catch (e) {
+      if (bodyValue) {
+        try {
+          JSON.parse(bodyValue);
+        } catch (e) {
           
-//           console.log('Invalid existing JSON, generating new schema');
-//         }
-//       }
+          console.log('Invalid existing JSON, generating new schema');
+        }
+      }
 
-//       const result = await mutateAsync({
-//         prompt: promptText,
-//         method: tabs.find(t => t.id === activeTabId)?.method || 'POST',
-//         endpoint: tabs.find(t => t.id === activeTabId)?.url || '/',
-//         context: `Generate a JSON body with the following requirements: ${promptText}`,
+      const result = await mutateAsync({
+        prompt: promptText,
+        method: tabs.find(t => t.id === activeTabId)?.method || 'POST',
+        endpoint: tabs.find(t => t.id === activeTabId)?.url || '/',
+        context: `Generate a JSON body with the following requirements: ${promptText}`,
        
-//       });
+      });
 
-//       if (result?.jsonBody) {
-//         form.setValue('body', JSON.stringify(result.jsonBody, null, 2));
-//       }
-//       setShowGenerateDialog(false);
-//       setPrompt('');
-//     } catch (error) {
-//       console.error('Failed to generate JSON body:', error);
-//     }
-//   }
+      if (result?.jsonBody) {
+        form.setValue('body', JSON.stringify(result.jsonBody, null, 2));
+      }
+      setShowGenerateDialog(false);
+      setPrompt('');
+    } catch (error) {
+      console.error('Failed to generate JSON body:', error);
+    }
+  }
 
 
   const handleFormat = () => {
@@ -205,7 +206,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {/* {contentType === 'application/json' && (
+              {contentType === 'application/json' && (
                 
                 <Button
                   type="button"
@@ -218,7 +219,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                 >
                   <Sparkles className={cn('h-3 w-3', isPending ? 'animate-spin text-zinc-400' : 'text-green-400')} />
                 </Button>
-              )} */}
+              )}
 
                 <Button
                   type="button"
@@ -307,7 +308,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
       </Form>
 
       {/* Generate JSON Dialog */}
-      {/* <Dialog open={showGenerateDialog} onOpenChange={setShowGenerateDialog}>
+      <Dialog open={showGenerateDialog} onOpenChange={setShowGenerateDialog}>
         <DialogContent className="sm:max-w-[425px] bg-zinc-900 text-zinc-100 border-zinc-800">
           <DialogHeader>
             <DialogTitle>Generate JSON Body</DialogTitle>
@@ -343,7 +344,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
     </div>
   )
 }
