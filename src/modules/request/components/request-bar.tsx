@@ -6,7 +6,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -23,7 +22,8 @@ interface Props {
 
 const RequestBar = ({ tab, updateTab }: Props) => {
 
-  const {mutateAsync, isPending} = useRunRequest(tab?.requestId!); 
+  const requestId = tab?.requestId || '';
+const {mutateAsync} = useRunRequest(requestId);
 
   const requestColorMap: Record<string, string> = {
     GET: "text-green-500",
@@ -34,10 +34,10 @@ const RequestBar = ({ tab, updateTab }: Props) => {
 
   const onSendRequest = async () => {
     try {
-      const res = await mutateAsync();
+      await mutateAsync();
       
       toast.success('Request sent successfully!');
-    } catch (error) {
+    } catch {
       toast.error('Failed to send request.');
     }
   }

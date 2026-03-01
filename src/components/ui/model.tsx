@@ -7,7 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import type { VariantProps } from 'class-variance-authority'
 
 interface ModalProps {
   children: React.ReactNode
@@ -17,9 +18,9 @@ interface ModalProps {
   onClose: () => void
   onSubmit?: () => void
   submitText?: string
+  submitVariant?: VariantProps<typeof buttonVariants>["variant"]
   cancelText?: string
   showFooter?: boolean
-  submitVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
   size?: string
   className?: string
 }
@@ -32,9 +33,9 @@ const Modal: React.FC<ModalProps> = ({
   onClose,
   onSubmit,
   submitText = 'Submit',
+  submitVariant,
   cancelText = 'Cancel',
   showFooter = true,
-  submitVariant = "default",
   size,
   className = ''
 }) => {
@@ -70,6 +71,7 @@ const Modal: React.FC<ModalProps> = ({
             </Button>
             {onSubmit && (
               <Button
+                variant={submitVariant}
                 className='bg-indigo-400 hover:bg-indigo-500 text-white'
                 onClick={handleSubmit}
               >

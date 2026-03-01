@@ -1,8 +1,7 @@
 "use client";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Folder, Plus, Search, X } from "lucide-react";
-import React, { useState, useEffect, act } from "react";
+import { Folder, Search } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { REST_METHOD } from "@prisma/client";
 import { Button } from "@/components/ui/button";
@@ -39,7 +38,8 @@ const SaveRequestToCollectionModal = ({
 
   
   const { selectedWorkspace } = useWorkspaceStore();
-  const { data: collections, isLoading, isError } = useCollections(selectedWorkspace?.id!);
+  const workspaceId = selectedWorkspace?.id || '';
+  const { data: collections, isLoading } = useCollections(workspaceId);
   const { mutateAsync, isPending } = useAddRequestToCollection(selectedCollectionId);
 
 
@@ -49,7 +49,7 @@ const SaveRequestToCollectionModal = ({
       setSelectedCollectionId(collectionId || "");
       setSearchTerm("");
     }
-  }, [isModalOpen, requestData.name, initialName]);
+  }, [isModalOpen, requestData.name, initialName, collectionId]);
 
 
   useEffect(() => {
@@ -113,7 +113,6 @@ const SaveRequestToCollectionModal = ({
       onClose={() => setIsModalOpen(false)}
       onSubmit={handleSubmit}
       submitText={isPending ? "Saving..." : "Save"}
-      submitVariant="default"
     >
       <div className="space-y-4">
        
@@ -163,10 +162,6 @@ const SaveRequestToCollectionModal = ({
               <div className="flex items-center justify-center py-8">
                 <div className="w-5 h-5 border-2 border-zinc-600 border-t-indigo-500 rounded-full animate-spin"></div>
                 <span className="ml-2 text-sm text-zinc-400">Loading collections...</span>
-              </div>
-            ) : isError ? (
-              <div className="text-center py-4 text-red-400 text-sm">
-                Failed to load collections
               </div>
             ) : filteredCollections.length === 0 ? (
               <div className="text-center py-4 text-zinc-500 text-sm">

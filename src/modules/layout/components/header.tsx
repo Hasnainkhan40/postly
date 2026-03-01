@@ -1,6 +1,6 @@
 "use client"
 
-import { Unplug, Search } from "lucide-react"
+import { Unplug } from "lucide-react"
 import React from "react"
 import { UserProps } from "../types"
 import UserButton from "../../authentication/components/user-button"

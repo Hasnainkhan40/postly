@@ -13,8 +13,8 @@ export function useAddRequestToCollection(collectionId: string) {
       queryClient.invalidateQueries({
         queryKey: ["requests", collectionId],
       });
-      // @ts-ignore
-      updateTabFromSavedRequest(activeTabId!, data);
+      // @ts-expect-error type mismatch
+      updateTabFromSavedRequest(activeTabId as string, data);
     },
   });
 };
@@ -36,8 +36,8 @@ export function useSaveRequest(id: string) {
         mutationFn: async (value: Request) => saveRequest(id, value),
         onSuccess: (data) => {
             queryClient.invalidateQueries({queryKey: ["requests"]})
-             // @ts-ignore
-              updateTabFromSavedRequest(activeTabId!, data);
+             // @ts-expect-error type mismatch
+              updateTabFromSavedRequest(activeTabId as string, data);
         }
     })
 }
@@ -50,7 +50,7 @@ export function useRunRequest(requestId: string) {
     mutationFn: async () => await run(requestId),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["requests"] });
-      // @ts-ignore
+      // @ts-expect-error type mismatch
       setResponseViewerData(data);
     },
   });

@@ -9,17 +9,14 @@ import RealtimeClientServerLogsTable from './realtime-client-server-logs-table'
 const RealtimeMessageEditor = () => {
   const { 
     send, 
-    status,
-    isConnected, 
     draftMessage, 
-    setDraftMessage, 
-    messages 
+    setDraftMessage,
+    status
   } = useWsStore()
   
   const [isSending, setIsSending] = useState(false)
-  const [lastSent, setLastSent] = useState('')
-  const editorRef = useRef(null)
-  const monacoRef = useRef(null)
+  const editorRef = useRef<unknown>(null)
+  const monacoRef = useRef<unknown>(null)
 
   useEffect(() => {
     if (!draftMessage) {
@@ -44,37 +41,40 @@ const RealtimeMessageEditor = () => {
       setIsSending(true)
       
       // Try to parse JSON to validate
-      let messageToSend
+      let messageToSend: string | object
       try {
         messageToSend = JSON.parse(draftMessage)
-
-      } catch (e) {
+      } catch {
         // If not valid JSON, send as string
         messageToSend = draftMessage
       }
 
       const success = send(messageToSend)
       if (success) {
-        setLastSent(draftMessage)
         toast.success('Message sent successfully')
       } else {
         toast.error('Failed to send message')
       }
-    } catch (error) {
-      console.error('Error sending message:', error)
-      toast.error('Error sending message: ' + (error instanceof Error ? error.message : String(error)))
+    } catch {
+      console.error('Error sending message')
+      toast.error('Error sending message')
     } finally {
       setIsSending(false)
     }
-  }, [draftMessage, send, isConnected])
+  }, [draftMessage, send, status])
 
   // Initialize Monaco Editor
-  const handleEditorDidMount = useCallback((editor: any, monaco: any) => {
+  const handleEditorDidMount = useCallback((editor: unknown, monaco: unknown) => {
     editorRef.current = editor
     monacoRef.current = monaco
 
+    // Casts to any necessary for interacting with Monaco APIs
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const _monaco = monaco as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const _editor = editor as any
 
-    monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+    _monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
       validate: true,
       allowComments: false,
       schemas: [],
@@ -82,7 +82,7 @@ const RealtimeMessageEditor = () => {
     })
 
     // Set editor options
-    editor.updateOptions({
+    _editor.updateOptions({
       theme: 'vs-dark',
       fontSize: 14,
       minimap: { enabled: false },
@@ -93,7 +93,7 @@ const RealtimeMessageEditor = () => {
     })
 
     // Add keyboard shortcut for sending (Ctrl+Enter)
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+    _editor.addCommand(_monaco.KeyMod.CtrlCmd | _monaco.KeyCode.Enter, () => {
       handleSendMessage()
     })
   }, [handleSendMessage])
@@ -104,10 +104,11 @@ const RealtimeMessageEditor = () => {
       const formatted = JSON.stringify(parsed, null, 2)
       setDraftMessage(formatted)
       if (editorRef.current) {
-        // @ts-ignore
+        // @ts-expect-error Monaco editor ref type
         editorRef.current.setValue(formatted)
       }
-    } catch (error) {
+    } catch {
+      // JSON parse error
       alert('Invalid JSON format')
     }
   }, [draftMessage, setDraftMessage])
@@ -126,9 +127,9 @@ const RealtimeMessageEditor = () => {
     const emptyMessage = '{\n  \n}'
     setDraftMessage(emptyMessage)
     if (editorRef.current) {
-      // @ts-ignore
+      // @ts-expect-error Monaco editor ref type
       editorRef.current.setValue(emptyMessage)
-      // @ts-ignore
+      // @ts-expect-error Monaco editor ref type
       editorRef.current.focus()
     }
   }, [setDraftMessage])

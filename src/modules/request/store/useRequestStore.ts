@@ -25,6 +25,18 @@ interface RequestRun {
   createdAt?: string;
 }
 
+interface OpenableRequest {
+  id: string;
+  name?: string | null;
+  method?: string;
+  url?: string | null;
+  body?: string;
+  headers?: string;
+  parameters?: string;
+  collectionId?: string;
+  workspaceId?: string;
+}
+
 interface Result {
   status?: number;
   statusText?: string;
@@ -66,7 +78,7 @@ type PlaygroundState = {
   setActiveTab: (id: string) => void;
   updateTab: (id: string, data: Partial<RequestTab>) => void;
   markUnsaved: (id: string, value: boolean) => void;
-  openRequestTab: (req: any) => void; // 👈 new
+  openRequestTab: (req: OpenableRequest) => void; // 👈 new
   updateTabFromSavedRequest: (tabId: string, savedRequest: SavedRequest) => void;
   responseViewerData:ResponseData | null;
   setResponseViewerData: (data:ResponseData) => void
@@ -89,6 +101,8 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
         headers: "",
         parameters: "",
         unsavedChanges: true,
+        responseViewerData: null,
+        setResponseViewerData: (data: ResponseData) => set({ responseViewerData: data }),
       };
       return {
         tabs: [...state.tabs, newTab ],
@@ -134,15 +148,17 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
       const newTab: RequestTab = {
         id: nanoid(),
         title: req.name || "Untitled",
-        method: req.method,
-        url: req.url,
-        body: req.body,
-        headers: req.headers,
-        parameters: req.parameters,
+        method: req.method || 'GET',
+        url: req.url || '',
+        body: req.body || '',
+        headers: req.headers || '',
+        parameters: req.parameters || '',
         requestId: req.id,
         collectionId: req.collectionId,
         workspaceId: req.workspaceId,
         unsavedChanges: false,
+        responseViewerData: null,
+        setResponseViewerData: (data: ResponseData) => set({ responseViewerData: data }),
       };
 
       return {

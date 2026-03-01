@@ -35,10 +35,10 @@ const RealtimeConnectionBar = () => {
     } else {
       // Connect to WebSocket
       connect(url, {
-        onOpen: (event) => {
+        onOpen: () => {
           console.log('Successfully connected to:', url)
         },
-        onClose: (event) => {
+        onClose: () => {
           console.log('Disconnected from WebSocket')
         },
         onError: (error) => {

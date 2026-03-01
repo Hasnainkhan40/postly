@@ -40,7 +40,7 @@ const InviteMember = () => {
       const response = await mutateAsync();
       setInviteLink(response);
       toast.success("Invite link generated!");
-    } catch (error) {
+        } catch {
       toast.error("Failed to generate invite link");
     }
   };
@@ -72,16 +72,19 @@ const InviteMember = () => {
             {isLoading ? (
               <p className="text-xs text-muted-foreground">Loading members...</p>
             ) : (
-              workspaceMembers?.map((member: any) => (
-                <Hint key={member.id} label={member.user.name || "Unknown User"}>
+              workspaceMembers?.map((member: unknown) => {
+                const m = member as { id: string; user: { name?: string; image?: string } };
+                return (
+                <Hint key={m.id} label={m.user.name || "Unknown User"}>
                   <Avatar className="border-2 border-background size-8 mt-2">
-                    <AvatarImage src={member.user.image || ""} />
+                    <AvatarImage src={m.user.image || ""} />
                     <AvatarFallback>
-                      {member.user.name?.charAt(0) || "?"}
+                      {m.user.name?.charAt(0) || "?"}
                     </AvatarFallback>
                   </Avatar>
                 </Hint>
-              ))
+                );
+              })
             )}
           </div>
 
