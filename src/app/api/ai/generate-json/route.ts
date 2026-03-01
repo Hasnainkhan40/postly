@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateJsonBody, generateSmartJsonBody } from '@/lib/ai-agents';
+import { generateJsonBody } from '@/lib/ai-agents';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { prompt, method, endpoint, context, existingSchema } = body;
+    const { prompt, method, endpoint, context } = body;
 
     if (!prompt) {
       return NextResponse.json(

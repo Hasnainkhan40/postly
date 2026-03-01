@@ -2,10 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useRequestPlaygroundStore } from "../store/useRequestStore";
-import { Sparkle, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSuggestRequestName } from "@/modules/ai/hooks/ai-suggestion";
-import { set } from "zod";
 import { Input } from "@/components/ui/input";
 import Modal from "@/components/ui/model";
 
@@ -19,16 +18,15 @@ const AddNameModal = ({
   tabId: string;
 }) => {
   const { updateTab, tabs, markUnsaved } = useRequestPlaygroundStore();
-  const {mutateAsync , data , isPending , isError} = useSuggestRequestName();
+  const {mutateAsync, isPending} = useSuggestRequestName();
   const tab = tabs.find((t) => t.id === tabId);
 
   const [name, setName] = useState(tab?.title || "");
-  const [suggestions, setSuggestions] = useState<Array<{name: string; reasoning: string}>>([]);
+  const [suggestions, setSuggestions] = useState<Array<{ name: string; reasoning?: string }>>([]);
 
- 
   useEffect(() => {
     if (tab) setName(tab.title);
-  }, [tabId]);
+  }, [tabId, tab]);
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
@@ -81,7 +79,7 @@ const AddNameModal = ({
                 setName(result.suggestions[0].name);
                 toast.success("Generated name suggestions");
               }
-            } catch (error) {
+            } catch {
               toast.error("Failed to generate name suggestions");
             }
           }} 

@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useEffect, useRef, useCallback } from "react";
-import { useForm, useFieldArray, Control } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -74,14 +73,6 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
     name: "items",
   });
 
-  const handleSubmit = (data: KeyValueFormData) => {
-    const filteredItems = data.items
-      .filter((item) => item.enabled && (item.key.trim() || item.value.trim()))
-      .map(({ key, value }) => ({ key, value }));
-
-    onSubmit(filteredItems);
-  };
-
   const addNewRow = () => {
     append({ key: "", value: "", enabled: true });
   };
@@ -108,10 +99,10 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
       )
       .map(({ key, value }) => ({ key, value }));
 
-  // Simple debounce implementation
-  const debounce = (fn: (...args: any[]) => void, wait = 500) => {
+  // Simple debounce implementation (generic-safe)
+  const debounce = <T extends unknown[]>(fn: (...args: T) => void, wait = 500) => {
     let t: ReturnType<typeof setTimeout> | null = null;
-    return (...args: any[]) => {
+    return (...args: T) => {
       if (t) clearTimeout(t);
       t = setTimeout(() => fn(...args), wait);
     };

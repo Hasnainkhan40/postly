@@ -38,7 +38,7 @@ export const deleteCollection = async (collectionId: string) => {
 
 
 export const editCollection = async (collectionId: string, name: string) => {
-    const collection = await db.collection.update({
+    await db.collection.update({
         where: {
             id: collectionId
         },

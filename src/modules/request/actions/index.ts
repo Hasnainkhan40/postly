@@ -70,7 +70,7 @@ export async function sendRequest(req: {
   url: string;
   headers?: Record<string, string>;
   params?: Record<string, string>;
-  body?: any;
+  body?: unknown;
 }) {
   const config: AxiosRequestConfig = {
     method: req.method,
@@ -101,10 +101,10 @@ export async function sendRequest(req: {
       duration: Math.round(duration),
       size,
     };
-  } catch (error: any) {
+  } catch (err) {
     const end = performance.now();
     return {
-      error: error.message,
+      error: err instanceof Error ? err.message : 'Unknown error',
       duration: Math.round(end - start),
     };
   }
@@ -122,11 +122,36 @@ export async function run(requestId: string) {
     }
 
    
+    // Normalize headers and parameters to the expected shapes for sendRequest
+    let headers: Record<string, string> | undefined = undefined;
+    if (request.headers) {
+      try {
+        const parsed = typeof request.headers === 'string' ? JSON.parse(request.headers) : request.headers;
+        if (parsed && typeof parsed === 'object') {
+          headers = Object.fromEntries(Object.entries(parsed).map(([k, v]) => [k, String(v)]));
+        }
+      } catch {
+        headers = undefined;
+      }
+    }
+
+    let params: Record<string, string> | undefined = undefined;
+    if (request.parameters) {
+      try {
+        const parsed = typeof request.parameters === 'string' ? JSON.parse(request.parameters) : request.parameters;
+        if (parsed && typeof parsed === 'object') {
+          params = Object.fromEntries(Object.entries(parsed).map(([k, v]) => [k, String(v)]));
+        }
+      } catch {
+        params = undefined;
+      }
+    }
+
     const requestConfig = {
       method: request.method,
       url: request.url,
-      headers: request.headers as Record<string, string> || undefined,
-      params: request.parameters as Record<string, any> || undefined,
+      headers: headers || undefined,
+      params: params || undefined,
       body: request.body || undefined
     };
 
@@ -161,7 +186,7 @@ export async function run(requestId: string) {
       result
     };
 
-  } catch (error: any) {
+  } catch (err) {
     try {
       const failedRun = await db.requestRun.create({
         data: {
@@ -169,20 +194,20 @@ export async function run(requestId: string) {
           status: 0,
           statusText: 'Failed',
           headers: "",
-          body: error.message,
+          body: err instanceof Error ? err.message : 'Unknown error',
           durationMs: 0
         }
       });
 
       return {
         success: false,
-        error: error.message,
+        error: err instanceof Error ? err.message : 'Unknown error',
         requestRun: failedRun
       };
     } catch (dbError) {
       return {
         success: false,
-        error: `Request failed: ${error.message}. DB save failed: ${(dbError as Error).message}`
+        error: `Request failed: ${err instanceof Error ? err.message : 'Unknown error'}. DB save failed: ${(dbError as Error).message}`
       };
     }
   }
@@ -194,15 +219,19 @@ export async function runDirect(requestData: {
   method: string;
   url: string;
   headers?: Record<string, string>;
-  parameters?: Record<string, any>;
-  body?: any;
+  parameters?: Record<string, unknown>;
+  body?: unknown;
 }) {
   try {
+    const params = requestData.parameters
+      ? Object.fromEntries(Object.entries(requestData.parameters).map(([k, v]) => [k, String(v)]))
+      : undefined;
+
     const requestConfig = {
       method: requestData.method,
       url: requestData.url,
       headers: requestData.headers,
-      params: requestData.parameters,
+      params,
       body: requestData.body
     };
 
@@ -236,21 +265,21 @@ export async function runDirect(requestData: {
       result
     };
 
-  } catch (error: any) {
+  } catch (err) {
     const failedRun = await db.requestRun.create({
       data: {
         requestId: requestData.id,
         status: 0,
         statusText: 'Failed',
         headers: "",
-        body: error.message,
+        body: err instanceof Error ? err.message : 'Unknown error',
         durationMs: 0
       }
     });
 
     return {
       success: false,
-      error: error.message,
+      error: err instanceof Error ? err.message : 'Unknown error',
       requestRun: failedRun
     };
   }

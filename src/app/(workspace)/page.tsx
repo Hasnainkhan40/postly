@@ -16,7 +16,8 @@ import RequestPlayground from "../../modules/request/components/request-playgrou
 
 const Page = () => {
   const { selectedWorkspace } = useWorkspaceStore();
-  const { data: currentWorkspace, isLoading } = useGetWorkspace( selectedWorkspace?.id!);
+  const workspaceId = selectedWorkspace?.id || '';
+  const { data: currentWorkspace, isLoading } = useGetWorkspace(workspaceId);
 
   if (isLoading) {
     return (

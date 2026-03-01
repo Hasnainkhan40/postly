@@ -1,4 +1,4 @@
-import { generateObject, generateText } from 'ai';
+import { generateObject } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod';
 
@@ -110,7 +110,7 @@ export async function generateJsonBody({
   method = 'POST',
   endpoint,
   context
-}: JsonBodyGenerationParams) {
+}: Omit<JsonBodyGenerationParams, 'existingSchema'>) {
   try {
     const systemPrompt = `
 You are an AI assistant that generates JSON request bodies for API calls.
@@ -147,7 +147,7 @@ IMPORTANT: Return the jsonBody as a valid JSON string that can be parsed with JS
     let parsedJsonBody;
     try {
       parsedJsonBody = JSON.parse(result.object.jsonBody);
-    } catch (parseError) {
+    } catch {
       // If parsing fails, return the string as-is
       parsedJsonBody = result.object.jsonBody;
     }
@@ -160,12 +160,12 @@ IMPORTANT: Return the jsonBody as a valid JSON string that can be parsed with JS
       },
       error: null
     };
-  } catch (error) {
-    console.error('Error generating JSON body:', error);
+  } catch (err) {
+    console.error('Error generating JSON body:', err);
     return {
       success: false,
       data: null,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: err instanceof Error ? err.message : 'Unknown error occurred'
     };
   }
 }
@@ -176,7 +176,7 @@ export async function generateSmartJsonBody({
   endpoint,
   context,
   existingSchema
-}: JsonBodyGenerationParams & { existingSchema?: Record<string, any> }) {
+}: JsonBodyGenerationParams & { existingSchema?: Record<string, unknown> }) {
   try {
     const enhancedPrompt = `
 You are an expert API developer creating JSON request bodies.
@@ -212,7 +212,7 @@ IMPORTANT: Return the jsonBody as a valid JSON string that can be parsed with JS
     let parsedJsonBody;
     try {
       parsedJsonBody = JSON.parse(result.object.jsonBody);
-    } catch (parseError) {
+    } catch {
       // If parsing fails, return the string as-is
       parsedJsonBody = result.object.jsonBody;
     }
@@ -225,12 +225,12 @@ IMPORTANT: Return the jsonBody as a valid JSON string that can be parsed with JS
       },
       error: null
     };
-  } catch (error) {
-    console.error('Error generating smart JSON body:', error);
+  } catch (err) {
+    console.error('Error generating smart JSON body:', err);
     return {
       success: false,
       data: null,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: err instanceof Error ? err.message : 'Unknown error occurred'
     };
   }
 }
@@ -243,7 +243,7 @@ export async function generateStructuredJsonBody({
   method = 'POST',
   endpoint,
   context
-}: JsonBodyGenerationParams) {
+}: Omit<JsonBodyGenerationParams, 'existingSchema'>) {
   try {
     const systemPrompt = `
 You are an AI assistant that generates JSON request bodies for API calls.
@@ -283,7 +283,7 @@ User Request: ${prompt}
 /**
  * Utility function to validate generated JSON
  */
-export function validateGeneratedJson(jsonBody: Record<string, any>): {
+export function validateGeneratedJson(jsonBody: Record<string, unknown>): {
   isValid: boolean;
   errors: string[];
   suggestions: string[];
@@ -321,7 +321,7 @@ export function validateGeneratedJson(jsonBody: Record<string, any>): {
       errors,
       suggestions
     };
-  } catch (error) {
+  } catch {
     errors.push('Invalid JSON structure');
     return {
       isValid: false,
